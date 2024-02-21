@@ -22,7 +22,7 @@ const TodoTasksService = {
       return error;
     }
   },
-
+  
   async deleteTask(id) {
     try {
       const task = await db.collection("tasks").deleteOne({

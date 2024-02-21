@@ -14,7 +14,6 @@ const TaskForm = () => {
       <Formik
         initialValues={{ task: "" }}
         onSubmit={async (values, { resetForm }) => {
-          console.log("values", values);
           setTodoList((prev) => [...prev, { task: values?.task }]);
           resetForm();
         }}

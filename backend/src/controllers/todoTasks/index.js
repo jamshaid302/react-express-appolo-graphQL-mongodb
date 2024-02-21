@@ -2,16 +2,14 @@ import TodoTasksService from "../../services/todoTasksService/index.js";
 
 const getTasks = async (req, res) => {
   try {
-    const data = await TodoTasksService.getTasks(req);
+    const data = await TodoTasksService.getTasks();
     return {
       data,
       count: data?.length,
     };
   } catch (error) {
-    return res.status(500).send({
-      message: "Error while fetching tasks",
-      error,
-    });
+    console.error("error", error);
+    throw new Error("Error while fetching tasks");
   }
 };
 
@@ -23,21 +21,18 @@ const createUpdateTask = async (req, res) => {
       data,
     });
   } catch (error) {
-    return res.status(500).send({
-      message: "Error while creating task",
-      error,
-    });
+    console.error("error", error);
+    throw new Error("Error while creating task");
   }
 };
 
 const deleteTask = async (req, res) => {
   try {
-    res.send("deleteTask");
+    const data = await TodoTasksService.deleteTask(req);
+    if (data?.acknowledged) return "Task delete Successfully";
   } catch (error) {
-    return res.status(500).send({
-      message: "Error while deleting task",
-      error,
-    });
+    console.error("error", error);
+    throw new Error("Error while deleting task");
   }
 };
 

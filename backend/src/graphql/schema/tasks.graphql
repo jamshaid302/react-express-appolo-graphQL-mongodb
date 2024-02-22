@@ -1,0 +1,24 @@
+scalar JSON
+scalar DateTime
+scalar Upload
+
+type Tasks {
+  _id: ID
+  title: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type GetTasksPayload {
+  data: [Tasks]
+  count: Int
+}
+
+type Query {
+  getTasks(where: JSON, take: Int, skip: Int, orderBy: JSON): GetTasksPayload
+}
+
+type Mutation {
+  createUpdateTask(data: JSON): Tasks
+  deleteTask(id: String): String
+}

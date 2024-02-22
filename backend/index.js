@@ -1,10 +1,22 @@
-const express = require("express");
-const app = express();
+import app from "./src/app.js";
+import * as dotenv from "dotenv";
+dotenv.config();
+import { connect } from "./src/utility/conn.js";
 
-app.get("/", (req, res) => {
-  res.send("Hello world");
-});
+const runServer = async () => {
+  // Connect to the database
+  await connect().then(() => {
+    console.log("Connected to the database");
+  });
 
-app.listen(9000, () => {
-  console.log(`Server listen on port 9000`);
-});
+  // start the server
+  app.listen(process.env.PORT, () => {
+    console.log(
+      `Server is running on port http://localhost:${process.env.PORT}`
+    );
+  });
+};
+
+runServer();
+
+export default app;

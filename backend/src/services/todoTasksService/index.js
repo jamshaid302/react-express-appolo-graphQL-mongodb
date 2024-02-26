@@ -5,8 +5,22 @@ const TodoTasksService = {
   async getTasks(args = {}) {
     try {
       const { where, take, skip, orderBy } = args || {};
-      const tasks = await db.collection("tasks").find({}).toArray();
+      const tasks = await db.collection("tasks").find(where).toArray();
       return tasks;
+    } catch (error) {
+      return error;
+    }
+  },
+
+  async getTaskByID(id = "") {
+    try {
+      const task = await db
+        .collection("tasks")
+        .find({
+          _id: new ObjectId(id),
+        })
+        .toArray();
+      return task;
     } catch (error) {
       return error;
     }
@@ -14,15 +28,36 @@ const TodoTasksService = {
 
   async createUpdateTask(data) {
     try {
-      const task = await db.collection("tasks").insertOne({
-        title: data?.title,
-      });
-      return task;
+      const { _id: id } = data || {};
+      let task;
+      if (!id) {
+        task = await db.collection("tasks").insertOne({
+          title: data?.title,
+        });
+      } else {
+        task = await db.collection("tasks").updateOne(
+          { _id: new ObjectId(id) },
+          {
+            $set: {
+              title: data?.title,
+            },
+          },
+          {
+            upsert: true,
+          }
+        );
+      }
+
+      return task?.acknowledged && id
+        ? {
+            insertedId: id,
+          }
+        : task;
     } catch (error) {
       return error;
     }
   },
-  
+
   async deleteTask(id) {
     try {
       const task = await db.collection("tasks").deleteOne({

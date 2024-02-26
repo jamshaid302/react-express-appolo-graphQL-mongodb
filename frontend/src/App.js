@@ -3,6 +3,9 @@ import { useQuery, useMutation } from "@apollo/client";
 import TaskForm from "./components/form";
 import TasksTable from "./components/table";
 import { GET_TASKS, DELETE_TASK } from "./utils/queries";
+import { todoListAtom } from "./recoil/atom";
+import { useRecoilState } from "recoil";
+import { useEffect, useState } from "react";
 
 function App() {
   const {
@@ -11,7 +14,14 @@ function App() {
     data: { getTasks } = {},
     refetch,
   } = useQuery(GET_TASKS);
+  const [_, setTodoList] = useRecoilState(todoListAtom);
   const [deleteTaskMutation] = useMutation(DELETE_TASK);
+  const [editedData, setEditedData] = useState({});
+  const [isEdit, setIsEdit] = useState(false);
+
+  useEffect(() => {
+    setTodoList(getTasks?.data);
+  }, [getTasks?.data, setTodoList]);
 
   if (loading) {
     return <p>Loading...</p>;
@@ -22,7 +32,8 @@ function App() {
   }
 
   const handleUpdate = (task) => {
-    console.log("Update task with ID:", task);
+    setIsEdit(true);
+    setEditedData(task);
   };
 
   const handleDelete = async (taskId) => {
@@ -36,7 +47,7 @@ function App() {
 
   return (
     <div className="App">
-      <TaskForm />
+      <TaskForm data={editedData} isEdit={isEdit} />
       <TasksTable
         data={getTasks?.data}
         handleUpdate={handleUpdate}

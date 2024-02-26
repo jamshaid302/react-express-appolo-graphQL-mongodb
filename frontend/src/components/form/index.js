@@ -2,20 +2,46 @@ import React from "react";
 import "./style.css";
 import { Form, Input, Button } from "antd";
 import { Formik } from "formik";
-import { useRecoilState } from "recoil";
-import { todoListAtom } from "../../recoil/atom";
+import { CREATE_UPDATE_TASK, GET_TASKS } from "../../utils/queries";
+import { useMutation, useQuery } from "@apollo/client";
 
-const TaskForm = () => {
-  const [_, setTodoList] = useRecoilState(todoListAtom);
+const TaskForm = ({ data = {}, isEdit = false }) => {
+  const [createUpdateTask] = useMutation(CREATE_UPDATE_TASK);
+  const { refetch } = useQuery(GET_TASKS);
+
+  const initialValues = {
+    task: isEdit ? data?.title : "",
+  };
 
   return (
     <div className="container">
-      <h1>Add Tasks</h1>
+      <h1>{isEdit ? "Edit Task" : "Add Tasks"}</h1>
       <Formik
-        initialValues={{ task: "" }}
+        initialValues={initialValues}
         onSubmit={async (values, { resetForm }) => {
-          setTodoList((prev) => [...prev, { task: values?.task }]);
-          resetForm();
+          try {
+            const formObj = {
+              variables: { data: { title: values?.task } },
+            };
+
+            const task = isEdit
+              ? await createUpdateTask({
+                  variables: {
+                    data: {
+                      _id: data?._id,
+                      title: values?.task,
+                    },
+                  },
+                })
+              : await createUpdateTask(formObj);
+
+            if (task?.data?.createUpdateTask?._id) {
+              resetForm();
+              refetch();
+            }
+          } catch (error) {
+            console.error("error", error);
+          }
         }}
       >
         {(formik) => (
@@ -27,11 +53,12 @@ const TaskForm = () => {
                 name="task"
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                value={formik.values.task}
+                value={formik?.values?.task}
+                required
               />
             </Form.Item>
             <Form.Item>
-              <Button htmlType="submit">Add</Button>
+              <Button htmlType="submit">{isEdit ? "Update" : "Add"}</Button>
             </Form.Item>
           </Form>
         )}

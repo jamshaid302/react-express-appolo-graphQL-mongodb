@@ -1,4 +1,5 @@
 import TodoTasksService from "../../services/todoTasksService/index.js";
+import { ObjectId } from "mongodb";
 
 const getTasks = async (req, res) => {
   try {
@@ -13,13 +14,16 @@ const getTasks = async (req, res) => {
   }
 };
 
-const createUpdateTask = async (req, res) => {
+const createUpdateTask = async ({ data = {} }) => {
   try {
-    const data = await TodoTasksService.createUpdateTask(req?.body);
-    return res.status(200).send({
-      message: "Task Created",
-      data,
+    const res = await TodoTasksService.createUpdateTask(data);
+    const insertedTask = await TodoTasksService.getTasks({
+      where: { _id: new ObjectId(res?.insertedId) },
     });
+    return {
+      _id: insertedTask[0]?._id,
+      title: insertedTask[0]?.title,
+    };
   } catch (error) {
     console.error("error", error);
     throw new Error("Error while creating task");

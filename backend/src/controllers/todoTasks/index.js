@@ -1,9 +1,9 @@
 import TodoTasksService from "../../services/todoTasksService/index.js";
 import { ObjectId } from "mongodb";
 
-const getTasks = async (req, res) => {
+const getTasks = async (args = {}) => {
   try {
-    const data = await TodoTasksService.getTasks();
+    const data = await TodoTasksService.getTasks(args);
     return {
       data,
       count: data?.length,
@@ -30,7 +30,7 @@ const createUpdateTask = async ({ data = {} }) => {
   }
 };
 
-const deleteTask = async (req, res) => {
+const deleteTask = async (id) => {
   try {
     const data = await TodoTasksService.deleteTask(req);
     if (data?.acknowledged) return "Task delete Successfully";

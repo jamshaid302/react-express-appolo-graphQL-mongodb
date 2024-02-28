@@ -32,7 +32,7 @@ const createUpdateTask = async ({ data = {} }) => {
 
 const deleteTask = async (id) => {
   try {
-    const data = await TodoTasksService.deleteTask(req);
+    const data = await TodoTasksService.deleteTask(id);
     if (data?.acknowledged) return "Task delete Successfully";
   } catch (error) {
     console.error("error", error);

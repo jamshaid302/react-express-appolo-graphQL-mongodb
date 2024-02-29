@@ -18,6 +18,7 @@ const TaskForm = ({ data = {}, isEdit = false }) => {
       <h1>{isEdit ? "Edit Task" : "Add Tasks"}</h1>
       <Formik
         initialValues={initialValues}
+        enableReinitialize
         onSubmit={async (values, { resetForm }) => {
           try {
             const formObj = {
